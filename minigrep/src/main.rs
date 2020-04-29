@@ -1,11 +1,25 @@
-use std::env;
 use std::process;
+use clap::{App, Arg};
 
 use minigrep::Config;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let config = Config::new(&args).unwrap_or_else(|err| {
+    let matches = App::new("Minigrep")
+        .arg(Arg::with_name("query").index(1).required(true))
+        .arg(Arg::with_name("file").index(2).required(true))
+        .arg(
+            Arg::with_name("case-insensitive")
+                .help("enable case insensitive search")
+                .short("i")
+                .long("case-insensitive")
+        )
+        .get_matches();
+    let query = matches.value_of("query").unwrap();
+    let file = matches.value_of("file").unwrap();
+    let args = [format!("Minigrep"), query.to_string(), file.to_string()];
+    let case_sensitive = !matches.is_present("case-insensitive");
+
+    let config = Config::new(&args, case_sensitive).unwrap_or_else(|err| {
         println!("Problem parsing arguments {}", err);
         process::exit(1);
     });

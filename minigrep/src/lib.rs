@@ -9,22 +9,20 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(args: &[String], case_sensitive: bool) -> Result<Config, &'static str> {
         if args.len() < 3 {
             return Err("Not enough arguments");
         }
-
         let query = args[1].clone();
         let filename = args[2].clone();
-        let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
-
+        let case_sensitive = case_sensitive && env::var("CASE_INSENSITIVE").is_err();
         Ok(Config { query, filename, case_sensitive })
     }
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
-    let results= if config.case_sensitive {
+    let results = if config.case_sensitive {
         search(&config.query, &contents)
     } else {
         search_case_insensitive(&config.query, &contents)
