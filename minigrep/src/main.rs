@@ -16,16 +16,16 @@ fn main() {
         .get_matches();
     let query = matches.value_of("query").unwrap();
     let file = matches.value_of("file").unwrap();
-    let args = [format!("Minigrep"), query.to_string(), file.to_string()];
+    let args = [format!("minigrep"), query.to_string(), file.to_string()];
     let case_sensitive = !matches.is_present("case-insensitive");
 
     let config = Config::new(&args, case_sensitive).unwrap_or_else(|err| {
-        println!("Problem parsing arguments {}", err);
+        eprintln!("Problem parsing arguments {}", err);
         process::exit(1);
     });
 
     if let Err(e) = minigrep::run(config) {
-        println!("Application error {}", e);
+        eprintln!("Application error {}", e);
 
         process::exit(1);
     }
